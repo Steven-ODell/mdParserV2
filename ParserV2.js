@@ -61,30 +61,42 @@ const mdParse = (inputString) => {
         let childLoop = true
         currentObject = parentString
         while (childLoop === true) {
-            let earliestPosition = Infinity
-            let earliestPattern = ""
+
+            let earliestPos = Infinity
+            let earliestPattern = null
             inlineItems.forEach(patterns => {
-                if ((parentString.value).includes(patterns.pattern)) {
-                    let substringValue = (parentString.value).substring(0, (parentString.value).indexOf(patterns.pattern))
-                    let patternlessValue = (parentString.value).replace(substringValue, "").replace(patterns.pattern, "")
-                    let patternPosition = (parentString.value).indexOf(patterns.pattern)
-                    parentString.value = substringValue
-                    let childObject = {
-                        type: patterns.type,
-                        value: patternlessValue,
-                        nestLevel: +1,
-                        children: [] 
-                        }
-                    currentObject.children.push(childObject)
-                    currentObject = childObject
-                    return true
+                if (currentObject.value.indexOf(patterns.pattern) > 0 &&
+                    currentObject.value.indexOf(patterns.pattern) < earliestPos) {
+                        earliestPos = currentObject.value.indexOf(patterns.pattern)
+                        earliestPattern = patterns
                 }
             })
-            if (!matched) {
+            let patternlessValue = currentObject.value
+            if (earliestPattern) {
+                let substringValue = (currentObject.value).substring(0, earliestPos)
+                patternlessValue = (currentObject.value).replace(substringValue, "").replace(earliestPattern.pattern, "").replace(earliestPattern.pattern, "")
+                currentObject.value = substringValue
+                let childObject = {
+                    type: earliestPattern.type,
+                    value: patternlessValue,
+                    nestLevel: currentObject.nestLevel + 1,
+                    children: []
+                }
+                currentObject.children.push(childObject)
+                currentObject = childObject
+            } else {
                 childLoop = false
+                    let childObject = {
+                    type: "inlineText",
+                    value: patternlessValue,
+                    nestLevel: currentObject.nestLevel + 1,
+                    children: []
+                }
+                currentObject.children.push(childObject)
+                currentObject = childObject
             }
         }
-})
+    })
     console.log(JSON.stringify(root, null, 2))
     return JSON.stringify(root, null, 2)
 }

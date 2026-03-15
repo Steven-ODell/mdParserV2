@@ -31,6 +31,7 @@ const mdParse = (inputString) => {
     let splitStringArray = inputString.split("\n");
     root.length = 0
     let currentObject = {}
+    let nestLevel = 0 
 
     splitStringArray.forEach(block => {
         const matched = startingItems.find(patterns => {
@@ -56,49 +57,34 @@ const mdParse = (inputString) => {
         }
     })
     console.log("blocks: ", root)
-    
-    root.forEach(parentString => {
-        let childLoop = true
-        currentObject = parentString
-        while (childLoop === true) {
 
-            let earliestPos = Infinity
-            let earliestPattern = null
-            inlineItems.forEach(patterns => {
-                if (currentObject.value.indexOf(patterns.pattern) > 0 &&
-                    currentObject.value.indexOf(patterns.pattern) < earliestPos) {
-                        earliestPos = currentObject.value.indexOf(patterns.pattern)
-                        earliestPattern = patterns
-                }
-            })
-            let patternlessValue = ""
-            if (earliestPattern) {
-                let substringValue = (currentObject.value).substring(0, earliestPos)
-                let afterOpen = (currentObject.value).replace(substringValue, "").replace(earliestPattern.pattern, "")
-                let closePos = afterOpen.indexOf(earliestPattern.pattern)
-                patternlessValue = afterOpen.substring(0, closePos)
-                currentObject.value = substringValue
-                let childObject = {
-                    type: earliestPattern.type,
-                    value: patternlessValue,
-                    nestLevel: currentObject.nestLevel + 1,
-                    children: []
-                }
-                currentObject.children.push(childObject)
-                currentObject = childObject
-                currentObject.value = afterOpen.substring(closePos + earliestPattern.pattern.length)
-            } else if (!earliestPattern){
-                childLoop = false
-                    patternlessValue = currentObject.value 
-                    let childObject = {
-                    type: "inlineText",
-                    value: patternlessValue,
-                    nestLevel: currentObject.nestLevel + 1,
-                    children: []
-                }
+    root.forEach(node => {
+        let currentValue = node.value
+        inlineItems.forEach(i => {
+            let startPatternPos = currentValue.indexOf(i.pattern)
+            let closingPatternPos = currentValue.indexOf(i.pattern, startPatternPos + i.pattern.length)
+            let patternValue = currentValue.substring(startPatternPos, closingPatternPos)
 
+            let patternValueMinusPattern =  patternValue.replace(i.pattern, "")
+            let currentValueStart = currentValue.substring(0, startPatternPos)
+            let currentValueSubstring = currentValue.substring(closingPatternPos, Infinity)
+            let currentValueRemainder = currentValueSubstring.replace(patternValue, "").replace(i.pattern, "")
+            
+            if (startPatternPos === -1) 
+                {return}
+            
+            let childObject = {
+                type: i.type,
+                value: patternValueMinusPattern,
+                nestLevel: nestLevel + 1,
+                children: [] 
             }
-        }
+            currentObject.children.push(childObject)
+            currentObject.value = currentValueStart
+            childObject.value = currentValueRemainder
+
+        
+        })
     })
     console.log(JSON.stringify(root, null, 2))
     return JSON.stringify(root, null, 2)

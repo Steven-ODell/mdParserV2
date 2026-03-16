@@ -1,0 +1,30 @@
+# Project: Vanilla Markdown Parser
+## Phase 1: Core Architecture
+### Developer Notes
+---
+Before we start writing more `JavaScript`, we need to verify the DOM is updating correctly. We absolutely do not want any ~~infinite loops~~ crashing the browser today!
+
+To make this work, we are heavily relying on **Arrays**, *String Replacement*, and some ***Regex magic***. It is also highly recommended to test the ==Highlighter formatting== to ensure the CSS visually pops on the dark mode background.
+
+> The golden rule of programming: If your code works, do not touch it. Just step away from the keyboard.
+
+Here is the daily task list:
+- Brew a massive pot of coffee
+- Review the GitHub repository
+ - Read the existing issues(indented)
+ - Approve the pull requests(indented)
+- Write the new parser logic
+ 1. Fix the unordered list bug(indented)
+ 2. Test the nested handoffs(indented)
+- Deploy to the live server
+
+Here are the deployment steps:
+1. Commit all local changes
+ - Write a descriptive commit message(indented)
+ - Double check the git status(indented)
+2. Push the branch to main
+3. Update the documentation
+ 4. Add the installation steps(indented)
+ 5. Include UI screenshots(indented)
+
+If all else fails, remember that H~2~O and E=mc^2^ are easier to parse than nested HTML tags!

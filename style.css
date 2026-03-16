@@ -32,6 +32,11 @@ textarea {
     resize: none;
 }
 
+textarea.focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 li::marker {
     color: rgb(140, 104, 175);
 }

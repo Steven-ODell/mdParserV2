@@ -56,35 +56,74 @@ const mdParse = (inputString) => {
             root.push(currentObject)
         }
     })
-    console.log("blocks: ", root)
 
     root.forEach(node => {
         let currentValue = node.value
-        inlineItems.forEach(i => {
-            let startPatternPos = currentValue.indexOf(i.pattern)
-            let closingPatternPos = currentValue.indexOf(i.pattern, startPatternPos + i.pattern.length)
-            let patternValue = currentValue.substring(startPatternPos, closingPatternPos)
+        node.value = ""
 
-            let patternValueMinusPattern =  patternValue.replace(i.pattern, "")
+
+        while (currentValue.length > 0) {
+            let earliestPos = Infinity
+            let earliestPattern = null
+
+            inlineItems.forEach(i => {
+                let idx = currentValue.indexOf(i.pattern)
+                if (idx !== -1 && idx < earliestPos) {
+                    earliestPos = idx
+                    earliestPattern = i
+                }
+            })
+
+            if (!earliestPattern) {
+                if (currentValue.length > 0) {
+                    node.children.push({ 
+                        type: "inlineText", 
+                        value: currentValue, 
+                        nestLevel: 1, 
+                        children: [] 
+                    })
+                }
+                break
+            }            
+            let startPatternPos = earliestPos
+            let closingPatternPos = currentValue.indexOf(earliestPattern.pattern, startPatternPos + earliestPattern.pattern.length)
+            if (closingPatternPos === -1) {
+                node.children.push({ 
+                    type: "inlineText", 
+                    value: currentValue, 
+                    nestLevel: 1, 
+                    children: [] 
+                })
+                break
+            }
+
+            let patternValue = currentValue.substring(startPatternPos, closingPatternPos)
+            let patternValueMinusPattern =  patternValue.replace(earliestPattern.pattern, "")
+
             let currentValueStart = currentValue.substring(0, startPatternPos)
             let currentValueSubstring = currentValue.substring(closingPatternPos, Infinity)
-            let currentValueRemainder = currentValueSubstring.replace(patternValue, "").replace(i.pattern, "")
-            
-            if (startPatternPos === -1) 
-                {return}
+            let currentValueRemainder = currentValueSubstring.replace(patternValue, "").replace(earliestPattern.pattern, "")
+                
+
             
             let childObject = {
-                type: i.type,
+                type: earliestPattern.type,
                 value: patternValueMinusPattern,
-                nestLevel: nestLevel + 1,
+                nestLevel: 1,
                 children: [] 
             }
-            currentObject.children.push(childObject)
-            currentObject.value = currentValueStart
-            childObject.value = currentValueRemainder
 
-        
-        })
+            if (currentValueStart.length > 0) {
+                node.children.push({ 
+                    type: "inlineText", 
+                    value: currentValueStart, 
+                    nestLevel: 1, 
+                    children: [] 
+                })
+            }
+            node.children.push(childObject)
+            currentValue = currentValueRemainder
+        } 
     })
     console.log(JSON.stringify(root, null, 2))
     return JSON.stringify(root, null, 2)

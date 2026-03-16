@@ -11,41 +11,13 @@ const startingItems = [
     { pattern:/^\d+\.\s/, type: "ol"},
 ]
 
-const inlineItems = [
-    { pattern: "***", type: "strongEm" },
-    { pattern: "**",  type: "strong" },
-    { pattern: "*",   type: "em" },
-    { pattern: "~~",  type: "del" },
-    { pattern: "~",   type: "sub" },
-    { pattern: "^",   type: "sup" },
-    { pattern: "==",  type: "mark" },
-    { pattern: "`",   type: "code" }
-]
-
-const rendererDict = [
-    { type:"h1", open: "<h1>", close: "</h1>"},
-    { type:"h2", open: "<h2>", close: "</h2>"},
-    { type:"h3", open: "<h3>", close: "</h3>"},
-    { type:"blockquote", open: "<blockquote>", close: "</blockquote>"},
-    { type:"ul", open: "<ul>", close: "</ul>"},
-    { type:"ol", open: "<ol>", close: "</ol>"},
-    { type:"code", open: "<code>", close: "</code>"},
-    { type:"mark", open: "<mark>", close: "</mark>"},
-    { type:"sup", open: "<sup>", close: "</sup>"},
-    { type:"sub", open: "<sub>", close: "</sub>"},
-    { type: "del", open: "<del>", close: "</del>"},
-    { type:"em", open: "<em>", close: "</em>"},
-    { type:"strong", open: "<strong>", close: "<strong>"},
-    { type:"strongEm", open: "<strong><em>", close: "</em></strong>"},
-]
-
 inputBox.addEventListener('input', ()  => {
-    outputDiv.innerHTML = mdParse(inputBox.value)
+    const rootReadyForRender = blockParser(inputBox.value)
+    console.log(rootReadyForRender)
+    outputDiv.innerHTML = renderer(rootReadyForRender)
 })
 
-
-
-const mdParse = (inputString) => {
+const blockParser = (inputString) => {
 
     let splitStringArray = inputString.split("\n");
     root.length = 0
@@ -77,10 +49,19 @@ const mdParse = (inputString) => {
     })
     root  = inlineParser(root)
     console.log(JSON.stringify(root, null, 2))
-    return JSON.stringify(root, null, 2)
+    return root
 }
 
-
+const inlineItems = [
+    { pattern: "***", type: "strongEm" },
+    { pattern: "**",  type: "strong" },
+    { pattern: "*",   type: "em" },
+    { pattern: "~~",  type: "del" },
+    { pattern: "~",   type: "sub" },
+    { pattern: "^",   type: "sup" },
+    { pattern: "==",  type: "mark" },
+    { pattern: "`",   type: "code" }
+]
 
 const inlineParser = (inputRoot) => {
     inputRoot.forEach(node => {
@@ -150,4 +131,54 @@ const inlineParser = (inputRoot) => {
         } 
     })
     return inputRoot
+}
+
+const rendererDict = [
+    { type:"p", open: "<p>", close: "</p>"},
+    { type:"inlineText", open: "", close: ""},
+    { type:"h1", open: "<h1>", close: "</h1>"},
+    { type:"h2", open: "<h2>", close: "</h2>"},
+    { type:"h3", open: "<h3>", close: "</h3>"},
+    { type:"blockquote", open: "<blockquote>", close: "</blockquote>"},
+    { type:"ul", open: "<ul>", close: "</ul>"},
+    { type:"ol", open: "<ol>", close: "</ol>"},
+    { type:"code", open: "<code>", close: "</code>"},
+    { type:"mark", open: "<mark>", close: "</mark>"},
+    { type:"sup", open: "<sup>", close: "</sup>"},
+    { type:"sub", open: "<sub>", close: "</sub>"},
+    { type: "del", open: "<del>", close: "</del>"},
+    { type:"em", open: "<em>", close: "</em>"},
+    { type:"strong", open: "<strong>", close: "</strong>"},
+    { type:"strongEm", open: "<strong><em>", close: "</em></strong>"},
+]
+
+const renderer = (inputRoot) => {
+    
+    let finalString = ""
+
+    inputRoot.forEach(node => {
+        let blockLabel = rendererDict.find(d => {
+            if (d.type === node.type) { return true }
+        })
+        finalString += blockLabel.open
+
+        let blockChildren = node.children
+        if (blockChildren.length > 0) {
+            blockChildren.forEach(child => {
+            rendererDict.find(d => {
+                let dictType = d.type
+                    if (child.type === dictType){
+                        finalString += d.open + child.value + d.close
+                        return true
+                    }
+                //console.log("ParentType:" + node.type)
+                //console.log("ChildType:" + child.type)
+                //console.log("Value:" + child.value)                  
+                })
+            })
+        }
+        finalString += blockLabel.close
+        console.log(finalString)
+    })
+    return finalString
 }

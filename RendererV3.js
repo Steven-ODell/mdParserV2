@@ -20,19 +20,20 @@ const rendererDict = [
 
 ]
 
-
 const renderer = (inputRoot) => {
     
-    let finalString = ""
+    let finalString = "" 
 
     inputRoot.forEach(node => {
-        let blockLabel = rendererDict.find(d => {
+
+        let blockLabel = rendererDict.find(d => { 
             if (d.type === node.type) { return true }
         })
+        // Find header type and add opener for the HTML block
         finalString += blockLabel.open
 
         let blockChildren = node.children
-        if (blockChildren.length > 0) {
+        if (blockChildren.length > 0) { // If there are children then go through them find type then attach appropriate HTML blocks around value and add that to the string
             blockChildren.forEach(child => {
                 rendererDict.find(d => {
                     let dictType = d.type
@@ -46,7 +47,7 @@ const renderer = (inputRoot) => {
                 })
             })
         }
-        finalString += blockLabel.close
+        finalString += blockLabel.close // Add HTML block closer
         console.log(finalString)
     })
     return finalString

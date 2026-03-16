@@ -7,11 +7,11 @@ body {
 div {
     background-color: black;
     margin-top: 15px;
-    height: 91vh;
+    height: 94vh;
     width: 50vw;
     color: white;
     border-radius: 12px;
-    padding-top: 17px;
+    padding-top: 0px;
     padding-left: 17px;
     font-size: large;
     overflow-y: auto;

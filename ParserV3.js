@@ -22,9 +22,28 @@ const inlineItems = [
     { pattern: "`",   type: "code" }
 ]
 
+const rendererDict = [
+    { type:"h1", open: "<h1>", close: "</h1>"},
+    { type:"h2", open: "<h2>", close: "</h2>"},
+    { type:"h3", open: "<h3>", close: "</h3>"},
+    { type:"blockquote", open: "<blockquote>", close: "</blockquote>"},
+    { type:"ul", open: "<ul>", close: "</ul>"},
+    { type:"ol", open: "<ol>", close: "</ol>"},
+    { type:"code", open: "<code>", close: "</code>"},
+    { type:"mark", open: "<mark>", close: "</mark>"},
+    { type:"sup", open: "<sup>", close: "</sup>"},
+    { type:"sub", open: "<sub>", close: "</sub>"},
+    { type: "del", open: "<del>", close: "</del>"},
+    { type:"em", open: "<em>", close: "</em>"},
+    { type:"strong", open: "<strong>", close: "<strong>"},
+    { type:"strongEm", open: "<strong><em>", close: "</em></strong>"},
+]
+
 inputBox.addEventListener('input', ()  => {
     outputDiv.innerHTML = mdParse(inputBox.value)
 })
+
+
 
 const mdParse = (inputString) => {
 
@@ -56,8 +75,15 @@ const mdParse = (inputString) => {
             root.push(currentObject)
         }
     })
+    root  = inlineParser(root)
+    console.log(JSON.stringify(root, null, 2))
+    return JSON.stringify(root, null, 2)
+}
 
-    root.forEach(node => {
+
+
+const inlineParser = (inputRoot) => {
+    inputRoot.forEach(node => {
         let currentValue = node.value
         node.value = ""
 
@@ -103,9 +129,7 @@ const mdParse = (inputString) => {
             let currentValueStart = currentValue.substring(0, startPatternPos)
             let currentValueSubstring = currentValue.substring(closingPatternPos, Infinity)
             let currentValueRemainder = currentValueSubstring.replace(patternValue, "").replace(earliestPattern.pattern, "")
-                
 
-            
             let childObject = {
                 type: earliestPattern.type,
                 value: patternValueMinusPattern,
@@ -125,6 +149,5 @@ const mdParse = (inputString) => {
             currentValue = currentValueRemainder
         } 
     })
-    console.log(JSON.stringify(root, null, 2))
-    return JSON.stringify(root, null, 2)
+    return inputRoot
 }

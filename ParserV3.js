@@ -99,7 +99,7 @@ const mdParse = (inputString) => {
 
             let patternValue = currentValue.substring(startPatternPos, closingPatternPos)
             let patternValueMinusPattern =  patternValue.replace(earliestPattern.pattern, "")
-
+            
             let currentValueStart = currentValue.substring(0, startPatternPos)
             let currentValueSubstring = currentValue.substring(closingPatternPos, Infinity)
             let currentValueRemainder = currentValueSubstring.replace(patternValue, "").replace(earliestPattern.pattern, "")

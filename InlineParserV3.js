@@ -77,6 +77,17 @@ const inlineParser = (inputRoot) => {
                     children: [] 
                 })
             }
+            
+            /*TODO MAKE THIS WORK
+            if (node.children.at(-1).type === "ol" || node.children.at(-1).type === "ul") {
+                    node.children.at(-1).children.push({  //HOW DO I MAKE THIS THE CHILD PUSH NOT THE PARENT??
+                    type: "li", 
+                    value: currentValue, 
+                    nestLevel: 2, 
+                    children: [] 
+                })
+            }
+            */
             node.children.push(childObject)
             currentValue = currentValueRemainder
         } 

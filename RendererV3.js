@@ -17,7 +17,7 @@ const rendererDict = [
     { type:"em", open: "<em>", close: "</em>"},
     { type:"strong", open: "<strong>", close: "</strong>"},
     { type:"strongEm", open: "<strong><em>", close: "</em></strong>"},
-
+    { type:"li", open: "<li>", close: "</li>"},
 ]
 
 const renderer = (inputRoot) => {

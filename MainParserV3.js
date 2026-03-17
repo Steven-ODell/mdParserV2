@@ -15,6 +15,7 @@ const startingItems = [
     { pattern:/^\d+\.\s/, type: "ol"},
     { pattern:/^\-\-\-/, type: "hr"},
 ]
+
 // Test Input area
 inputBox.addEventListener('input', ()  => {
     const rootReadyForRender = blockParser(inputBox.value)
